@@ -69,7 +69,7 @@ in at least 4 of 5 tries.
        - "No chunk is shorter than 200 characters, since anything below that
           in my corpus turned out to be a heading with no content under it." -->
 
-
+At least 4 of the 5 sample chunks are between 250 - 500 tokens in size
 
 **Why this target:**
 

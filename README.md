@@ -27,6 +27,8 @@
 
      Milestone 5. -->
 
+I chose to work with the campus life corpus. This corpus is comprised of 88 reviews of what this specific campus is like. My system can answer questions on details of that campus such as a few classes that were reviewed, housing costs, and daily life. The idea is that the information is grounded based on what is given to us so that the system is able to give more accurate answers more often than not. 
+
 ## Chunking Strategy
 
 **Chunk size:**
@@ -113,9 +115,74 @@ without reading what came before or after?
 
 **Question:**
 
+"How often does the campus shuttle loop on weekdays?"
+
 **Answer:**
 
 ```
+======================================================================
+System instruction sent with the prompt
+======================================================================
+You answer questions using only the documents provided to you.
+
+Rules:
+- Use only the information in the documents below. Do not use anything you know from elsewhere.
+- If the documents don't cover the question, say you don't have enough information. Do not guess.
+- Name the document your answer came from, using the filename given in each excerpt.
+- Be brief. Two or three sentences is usually enough.
+
+======================================================================
+The assembled prompt, exactly as sent
+======================================================================
+Documents:
+
+[from transit_shuttle.txt]
+The campus shuttle
+
+Runs a loop every 20 minutes from 7am to 11pm on weekdays and every 40 minutes on weekends. The published timetable is optimistic by about five minutes in the morning and accurate the rest of the day.
+
+It's free with a student ID. The stop outside Fenwick Court is the one that gets skipped when the driver is behind, which is worth knowing if you live there.
+
+[from dining_verrill_street_grill.txt]
+Verrill Street Grill
+
+I'm a junior and I've done this twice now. Wait times: up to 30 minutes on Friday evenings, otherwise under 10. The thing worth going for is the burger, which is the only late-night hot food on campus. The thing to know is that one register, so the queue is a single line no matter how busy.
+
+Hours are 11:00am to 1:00am daily during term. Costs declining balance, or cash after 11:00pm.
+
+[from transit_walking.txt]
+Walking times across campus
+
+Rough numbers, measured rather than guessed. Aldridge Hall to the science quad: 4 minutes. Fenwick Court to central campus: 18 minutes. Morrow House to Kestrel Commons: 7 minutes. Library to Ridgeway Café: 3 minutes.
+
+Add four minutes in winter. The path past the pond genuinely ices over and people take the long way round.
+
+[from dining_halden_hall_followup.txt]
+Re: Halden Hall
+
+Adding to what people have said about Halden Hall. The wait figure of rarely more than 8 minutes matches what I've seen. If you're trying to eat between classes, go before 11:45 and it's a different building entirely.
+
+Also worth saying: closes at 7:00pm, which catches people out. Nobody tells you this at orientation.
+
+[from dining_kestrel_commons_followup.txt]
+Re: Kestrel Commons
+
+Adding to what people have said about Kestrel Commons. The wait figure of 20 to 25 minutes between 12:15 and 1:00 matches what I've seen. If you're trying to eat between classes, go before 11:45 and it's a different building entirely.
+
+Also worth saying: the salad bar wilts after 1:30. Nobody tells you this at orientation.
+
+---
+
+Question: How often does the campus shuttle loop on weekdays?
+
+Answer using only the documents above, and name the file you used.
+======================================================================
+
+The campus shuttle runs a loop every 20 minutes on weekdays (transit_shuttle.txt).
+
+Sources retrieved: dining_halden_hall_followup.txt, dining_kestrel_commons_followup.txt, dining_verrill_street_grill.txt, transit_shuttle.txt, transit_walking.txt
+
+0 model calls this session, 1 served from cache
 ```
 
 **My relevance cutoff:**
@@ -129,9 +196,20 @@ without reading what came before or after?
 
      Milestone 4. -->
 
+I chose to stick with 0.6 as my cutoff. The reason being some of the questions came back with a distance of roughly ~0.56 which would mean that if I lowered my cutoff I would have missed that answer. And going higher was not needed, as it seems that the distance of roughly 0.8 is when it begins to finally determine that it doesn't have the answer. So 0.6 seemed to be the sweet spot. 
+
 | Question | In corpus? | Best distance |
 |---|---|---|
-|  |  |  |
+|  "what is the maximum number of hours that can be worked in a week at the library?" | yes | 0.396 |
+|"what is the cheapest housing option?" | yes | 0.564|
+| "How long does the club fair go on for?" | yes | 0.457|
+| "How often does the campus shuttle loop on weekdays?" | yes | 0.372 |
+| "When do the paths get cleared on weekdays of snow?" | yes | 0.450 |
+| "What is the capital of Mongolia?" | No | 0.825 |
+| "How do I change the oil in a diesel engine?" | No | 0.934 |
+| "Who won the 1994 World Cup?" | No | 0.886 |
+| "What is the recommended dosage of ibuprofen for a headache?" | No | 0.844 |
+| "How do I write a for loop in Rust?" | No | 0.896 |
 
 ## How I Used AI
 
@@ -146,7 +224,11 @@ without reading what came before or after?
 
 **1.**
 
+I asked AI on ways on how we should chunk the data. It originally suggested to sperate each chunk by sentence, but this was because I told it that the corpus was reviews, and that each review was relatively small. It was wrong in doing so and I told it that this is not the correct way to seperate this corpus. It then helped me to create a chunker based on similar paragraphs, it stayed nearly identical to the starter chunker, but a little better for longer reviews. 
+
 **2.**
+
+I asked AI to help me create good acceptance critera. It gave me ones that were too similar to the original 3 that were given to us. I explained that these were identical to what we had already and that it wouldn't be a viable option. It agreed and helped me brainstorm 2 more ideas. 
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never

@@ -80,24 +80,140 @@ def fallback_split(
     return chunks
 
 
+# def split_documents(documents: list[Document]) -> list[Chunk]:
+# #     """
+# #     Split documents into chunks. ⚠️ REPLACE THE BODY OF THIS IN MILESTONE 3.
+
+# #     Right now it just calls the fallback. That is the plain, generic behaviour
+# #     the brief is talking about.
+
+# #     When you write your own strategy, set `produced_by` to
+# #     "chunker.py::split_documents" so your README's Sample Chunks section names
+# #     the right function. `app.py chunks` prints that string for you.
+
+# #     Things worth thinking about before you write any code:
+# #       - Are your documents short posts or long guides?
+# #       - Is the useful information in one sentence, or spread over a paragraph?
+# #       - Would splitting on paragraph breaks keep more thoughts intact than
+# #         splitting on a character count?
+# #     """
+# #     return fallback_split(documents)
+#     """
+#     Campus-life reviews are short, so each complete review is kept
+#     as one chunk to preserve its context and avoid fragmenting related ideas.
+#     """
+
+#     chunks: list[Chunk] = []
+
+#     for doc in documents:
+#         text = doc.text.strip()
+
+#         if text:
+#             chunks.append(
+#                 Chunk(
+#                     text=text,
+#                     source=doc.source,
+#                     index=0,
+#                     produced_by="chunker.py::split_documents",
+#                 )
+#             )
+
+#     return chunks
+
+import re
+
+
 def split_documents(documents: list[Document]) -> list[Chunk]:
     """
-    Split documents into chunks. ⚠️ REPLACE THE BODY OF THIS IN MILESTONE 3.
+    Structure-aware chunker for short review-style documents.
 
-    Right now it just calls the fallback. That is the plain, generic behaviour
-    the brief is talking about.
-
-    When you write your own strategy, set `produced_by` to
-    "chunker.py::split_documents" so your README's Sample Chunks section names
-    the right function. `app.py chunks` prints that string for you.
-
-    Things worth thinking about before you write any code:
-      - Are your documents short posts or long guides?
-      - Is the useful information in one sentence, or spread over a paragraph?
-      - Would splitting on paragraph breaks keep more thoughts intact than
-        splitting on a character count?
+    - Preserves short reviews.
+    - Uses paragraph boundaries.
+    - Splits longer multi-paragraph reviews into groups of paragraphs.
+    - Carries the document title into every chunk.
+    - Avoids tiny leftover chunks.
     """
-    return fallback_split(documents)
+
+    MAX_PARAGRAPHS = 2
+    MIN_CHARS = 140
+
+    chunks: list[Chunk] = []
+
+    for doc in documents:
+        text = doc.text.strip()
+
+        if not text:
+            continue
+
+        paragraphs = [
+            p.strip()
+            for p in re.split(r"\n\s*\n", text)
+            if p.strip()
+        ]
+
+        if not paragraphs:
+            continue
+
+        # Detect a likely title/header.
+        first = paragraphs[0]
+
+        if (
+            len(first) <= 100
+            and len(first.split()) <= 15
+            and not first.endswith((".", "!", "?"))
+        ):
+            title = first
+            body = paragraphs[1:]
+        else:
+            title = ""
+            body = paragraphs
+
+        # Reviews with only one or two body paragraphs stay intact.
+        if len(body) <= MAX_PARAGRAPHS:
+            chunks.append(
+                Chunk(
+                    text=text,
+                    source=doc.source,
+                    index=0,
+                    produced_by="chunker.py::split_documents",
+                )
+            )
+            continue
+
+        # Group body paragraphs into pairs.
+        groups = []
+
+        for i in range(0, len(body), MAX_PARAGRAPHS):
+            group = body[i:i + MAX_PARAGRAPHS]
+            groups.append(group)
+
+        # If the final group is tiny, merge it into the previous one.
+        if len(groups) > 1:
+            final_text = "\n\n".join(groups[-1])
+
+            if len(final_text) < MIN_CHARS:
+                groups[-2].extend(groups[-1])
+                groups.pop()
+
+        # Create chunks, repeating the title for context.
+        for index, group in enumerate(groups):
+            body_text = "\n\n".join(group)
+
+            if title:
+                chunk_text = f"{title}\n\n{body_text}"
+            else:
+                chunk_text = body_text
+
+            chunks.append(
+                Chunk(
+                    text=chunk_text,
+                    source=doc.source,
+                    index=index,
+                    produced_by="chunker.py::split_documents",
+                )
+            )
+
+    return chunks
 
 
 def describe(chunks: list[Chunk]) -> str:

@@ -28,6 +28,8 @@ contains the answer.
 
 ---
 
+4 out of 5 is ideal because retrieval should successfully find relevant information for most questions, but one question may be harder if the answer only appears briefly or in a small number of documents. Requiring 4 out of 5 still sets a high standard without assuming retrieval will be perfect every time.
+
 ## 2. Every answer names a source
 
 Every answer the system produces names at least one source document.
@@ -37,6 +39,8 @@ Every answer the system produces names at least one source document.
      or what would have to go wrong for it not to be? -->
 
 ---
+
+The purpose of this system is to provide answers that are grounded in the documents. If the system gives an answer but does not identify where the information came from, the user has no way to verify that the answer is actually supported by the corpus.
 
 ## 3. The relevance gate stops out-of-corpus questions
 
@@ -55,6 +59,8 @@ in at least 4 of 5 tries.
 
 ---
 
+The relevance gate should reject almost all questions that clearly have nothing to do with the corpus. However, similarity scores are not always perfect, so one unrelated question could still have wording that causes it to appear similar to a document.
+
 ## 4. Something about your chunks
 
 <!-- YOU WRITE THIS ONE.
@@ -69,15 +75,17 @@ in at least 4 of 5 tries.
        - "No chunk is shorter than 200 characters, since anything below that
           in my corpus turned out to be a heading with no content under it." -->
 
-At least 4 of the 5 sample chunks are between 250 - 500 tokens in size
+For at least 4 of my 5 sample chunks, a reader should be able to understand the main point using that chunk alone without needing the chunk before or after it.
 
 **Why this target:**
 
-
+I chose 4 out of 5 because the corpus contains shorter reviews, so most chunks should be able to preserve a complete thought without requiring information from the chunks around them. I do not expect every chunk to divide perfectly because some reviews may contain multiple ideas or sentences that do not separate cleanly.
 
 ---
 
 ## 5. Your choice
+
+For at least 4 of my 5 test questions, the final answer contains no factual information that is unsupported by the retrieved chunks.
 
 <!-- YOU WRITE THIS ONE TOO.
 
@@ -87,11 +95,9 @@ At least 4 of the 5 sample chunks are between 250 - 500 tokens in size
      present — anything, as long as it names a number or an observable
      outcome. -->
 
-
-
 **Why this target:**
 
-
+I chose 4 out of 5 because the system should normally stay grounded in the retrieved documents, but one answer may include wording or an inference that is difficult to trace directly to a chunk. I want the system to avoid making up information even when the answer sounds reasonable.
 
 ---
 

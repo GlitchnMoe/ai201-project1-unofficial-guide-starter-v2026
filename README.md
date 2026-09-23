@@ -32,7 +32,11 @@ I chose to work with the campus life corpus. This corpus is comprised of 88 revi
 ## Chunking Strategy
 
 **Chunk size:**
+2 paragraphs max, and a minimum of 140 characters 
+
 **Overlap:**
+
+0, the reviews were relatively short and if they were longer I would separate them into different chunks and keep the first line (which I called the "title") with the chunks in order to keep reference to some context.  
 
 <!-- What about YOUR documents made you pick these numbers? Short posts and
      long sectioned guides don't want the same chunking, and "800 seemed

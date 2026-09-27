@@ -261,15 +261,81 @@ I asked AI to help me create good acceptance critera. It gave me ones that were 
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 5/5 | 5/5 | 5/5 |  |
+| 2. Every answer names a source | 5 of 5 | 5/5 | 5/5 | 5/5 |  |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 |  |
+| 4. A reader can understand the chunk on its own| 4 of 5 | 5/5 | 5/5 | 5/5 | |
+| 5. Final answer contains no unsupported factual information | 4 of 5 | 5/5 | 5/5 | 5/5 | |
 
 <!-- Underneath, paste the REAL output for each criterion from one of your
      runs — the actual text your system produced, not a description of it.
      Name the file and function that produced it. -->
+
+## Real Output — Criterion 1
+
+File: results/run_2026-09-23_1848_before.md
+Produced by: run_eval.py::main
+Scored by: scorer.py::judge
+
+### Question:
+what is the maximum number of hours that can be worked in a week at the library?
+
+The maximum is 20 hours a week during term (money_jobs.txt).
+
+## Real Output — Criterion 2
+
+File: results/run_2026-09-23_1848_before.md
+Produced by: run_eval.py::main
+
+### Question:
+what is the cheapest housing option?
+
+Morrow House is the cheapest housing option by about $900 a year.
+
+Source: housing_morrow_house.txt
+
+## Real Output — Criterion 3
+
+File: results/run_2026-09-23_1848_before.md
+Produced by: run_eval.py::check_out_of_scope
+
+What is the capital of Mongolia? — refused
+How do I change the oil in a diesel engine? — refused
+Who won the 1994 World Cup? — refused
+What is the recommended dosage of ibuprofen for a headache? — refused
+How do I write a for loop in Rust? — refused
+
+Gate refused 5 of 5.
+
+## Real Output — Criterion 4
+
+### source: admin_add_drop_deadline.txt#0  -  produced by: chunker.py::split_documents
+
+On the add/drop deadline
+
+You can add a course through the end of the second week. Dropping is a longer window — through the end of week six — but a drop after week two shows as a W on your transcript. Nothing anywhere on the registrar's site says this plainly, and students find out from each other.     
+
+## Real Output — Criterion 5
+
+File: results/run_2026-09-23_1848_before.md
+Produced by: run_eval.py::main
+
+### Question:
+How often does the campus shuttle loop on weekdays?
+
+Sources retrieved:
+
+dining_halden_hall_followup.txt
+dining_kestrel_commons_followup.txt
+dining_verrill_street_grill.txt
+transit_shuttle.txt
+transit_walking.txt
+
+Actual answer:
+
+On weekdays, the campus shuttle runs a loop every 20 minutes.
+
+Source: transit_shuttle.txt
 
 ## Verdicts
 
@@ -284,11 +350,11 @@ I asked AI to help me create good acceptance critera. It gave me ones that were 
 
 | # | Criterion | Verdict | How I decided |
 |---|---|---|---|
-| 1 |  |  |  |
-| 2 |  |  |  |
-| 3 |  |  |  |
-| 4 |  |  |  |
-| 5 |  |  |  |
+| 1 | Retrieved chunks contain the answer | MET | The target was at least 4 of 5 questions, and all three runs scored 5/5, so the target held consistently across every run. |
+| 2 | Every answer names a source | MET | The target was 5 of 5, and all five generated answers named at least one source document in every run. |
+| 3 | The relevance gate stops out-of-corpus questions | MET | The target was at least 4 of 5, and the relevance gate refused all 5 out-of-scope questions. Because retrieval and the gate are deterministic, the result was 5/5 for all three run columns. |
+| 4 | A reader can understand the main point of a chunk without needing the chunk before or after it | MET | The target was at least 4 of 5 sample chunks, and all 5 sampled chunks could be understood on their own, giving a result of 5/5. |
+| 5 | Final answers contain no factual information unsupported by the retrieved chunks | MET | The target was at least 4 of 5 answers, and all 5 answers in each run stayed within the factual information supported by the retrieved material, giving 5/5 in all three runs. |
 
 ## Diagnoses
 
@@ -309,6 +375,16 @@ I asked AI to help me create good acceptance critera. It gave me ones that were 
      low, and which one you'd tighten and to what.
 
      Milestone 3. -->
+
+None of the five acceptance criteria were missed during the baseline evaluation, so there were no failures to trace back to a specific stage of the pipeline.
+
+Since every criterion passed on the first evaluation, some of the criteria may have tested behavior that was too easy for this corpus rather than pushing the system into more difficult cases. Criteria 1 through 3 were provided by the project and test the basic requirements of retrieval, source attribution, and the relevance gate.
+
+Of the criteria I wrote myself, Criterion 4 may have been too easy because the campus_life corpus consists mostly of short reviews that already contain enough context to be understood on their own. A stronger chunking criterion could test whether each chunk is not only understandable, but also focused enough that unrelated information does not interfere with retrieval.
+
+Criterion 5 was a stronger test because it required the generated answers to stay completely supported by the retrieved chunks. I would keep that criterion, but if I were writing the criteria again I would make Criterion 4 more demanding so that it tests retrieval usefulness rather than only readability.
+
+
 
 ## The Improvement
 

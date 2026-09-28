@@ -390,7 +390,11 @@ Criterion 5 was a stronger test because it required the generated answers to sta
 
 **What I changed:**
 
+I changed the chunking strategy so that each body paragraph is treated as a possible chunk instead of normally grouping two body paragraphs together. The document title is still repeated in each chunk to preserve context, and paragraphs shorter than 140 characters are merged with a neighboring paragraph so that very small fragments are not created.
+
 **Why I picked it:**
+
+I chose this change because my baseline system passed every acceptance criterion, but Criterion 4 may have been too easy for this corpus. Most of the documents are short, and some chunks were understandable while still containing multiple pieces of information. The new strategy was intended to create more focused chunks without losing the context needed to understand them.
 
 <!-- Connect it to a specific diagnosis above in one sentence. If you can't,
      you picked a fix because it sounded impressive. -->
@@ -402,11 +406,11 @@ Criterion 5 was a stronger test because it required the generated answers to sta
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 5/5 | 5/5 | 5/5 |  |
+| 2. Every answer names a source | 5 of 5 | 5/5 | 5/5 | 5/5 |  |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 |  |
+| 4. A reader can understand the chunk on its own| 4 of 5 | 5/5 | 5/5 | 5/5 | |
+| 5. Final answer contains no unsupported factual information | 4 of 5 | 5/5 | 5/5 | 5/5 | |
 
 **Did it help?**
 
@@ -416,6 +420,12 @@ Criterion 5 was a stronger test because it required the generated answers to sta
      tell.
 
      Milestone 4. -->
+
+The change did not improve the number of acceptance criteria passed because the baseline system had already met all five criteria. The generated answers also remained correct, cited their sources, and stayed grounded after the chunking change.
+
+However, the retrieval distances improved for two of the five questions. The cheapest-housing question improved from 0.5639 to 0.5283, while the campus-shuttle question improved much more substantially from 0.3724 to 0.1344. The other three questions had identical retrieval distances before and after the change.
+
+This suggests that the more focused paragraph-level chunks helped retrieval in cases where a relevant fact could be isolated from surrounding information. The effect was not universal, since three questions showed no change, but the new strategy improved retrieval quality for some questions without causing any of the previously passing questions to fail.
 
 ## What's Still Broken
 

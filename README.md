@@ -234,6 +234,16 @@ I asked AI on ways on how we should chunk the data. It originally suggested to s
 
 I asked AI to help me create good acceptance critera. It gave me ones that were too similar to the original 3 that were given to us. I explained that these were identical to what we had already and that it wouldn't be a viable option. It agreed and helped me brainstorm 2 more ideas. 
 
+**3.** (Added for UNIT 2)
+
+I used AI during this unit to help interpret the evaluation requirements, review my acceptance criteria, and identify patterns in the before-and-after results.
+
+I also used AI while developing the second chunking strategy. It helped me reason through how to split multi-paragraph documents into more focused chunks while still preserving the document title and avoiding very small fragments.
+
+After running the evaluation, I used AI to compare the before-and-after results and identify that the acceptance-criteria scores remained the same while retrieval distance improved for some questions, especially the campus shuttle question.
+
+I reviewed the suggestions and made the final decisions about the chunking strategy, acceptance-criteria judgments, and conclusions included in the project.
+
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
      claims earns nothing.
@@ -437,9 +447,29 @@ This suggests that the more focused paragraph-level chunks helped retrieval in c
 
      Milestone 5. -->
 
+None of my acceptance criteria were still missed after the improvement, so there was not a specific failed criterion that required another fix.
+
+However, the evaluation still has limitations. The test set only contains five questions, and all five have relatively direct answers in the corpus. Because of that, passing every criterion does not necessarily mean the system would perform equally well on harder or more ambiguous questions.
+
+Criterion 4 is also somewhat subjective because it asks whether a chunk can be understood on its own. The new chunking strategy creates more focused chunks, but readability alone does not guarantee that a chunk is optimally sized for retrieval.
+
+The improvement also did not help every query. Three of the five questions had the same retrieval distance as before. The housing question improved from 0.5639 to 0.5283, and the shuttle question improved substantially from 0.3724 to 0.1344, but the effect was not consistent across the full test set.
+
+I stopped after this change because the assignment called for one targeted improvement, and changing additional parts of the pipeline such as top-k, the relevance cutoff, or retrieval method would make it harder to determine which change caused the results.
+
 ## What I'd Do Differently
 
 <!-- Knowing what you know now — which of your five criteria would you write
      differently, and why?
 
      Milestone 5. -->
+
+If I were writing the acceptance criteria again, I would change Criterion 4. My original criterion only asked whether at least 4 of 5 sample chunks could be understood without needing the surrounding chunks. For this corpus, that was fairly easy because most documents are already short.
+
+I would make the criterion test whether chunks are both understandable and focused enough for retrieval. For example:
+
+`For at least 4 of 5 sample chunks, the chunk should contain one clear main topic and enough context to understand it without requiring the previous or next chunk. `
+
+This would test the actual quality of the chunking strategy more directly instead of only checking whether the text is readable by itself.
+
+I would also consider making Criterion 1 more specific in a future evaluation. Instead of only asking whether one of the retrieved chunks contains the answer, I could require the answer-containing chunk to appear within the top three retrieval results. That would make the criterion more sensitive to retrieval ranking quality.
